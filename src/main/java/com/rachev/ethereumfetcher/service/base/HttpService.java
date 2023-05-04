@@ -1,6 +1,5 @@
 package com.rachev.ethereumfetcher.service.base;
 
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;

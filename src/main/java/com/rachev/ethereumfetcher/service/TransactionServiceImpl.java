@@ -1,7 +1,6 @@
 package com.rachev.ethereumfetcher.service;
 
 import com.rachev.ethereumfetcher.entity.Transaction;
-import com.rachev.ethereumfetcher.entity.User;
 import com.rachev.ethereumfetcher.model.transaction.TransactionsDto;
 import com.rachev.ethereumfetcher.model.transaction.UnifiedTransactionDto;
 import com.rachev.ethereumfetcher.repository.TransactionRepository;
@@ -9,7 +8,6 @@ import com.rachev.ethereumfetcher.service.base.EthereumNodeRequestSender;
 import com.rachev.ethereumfetcher.service.base.TransactionService;
 import com.rachev.ethereumfetcher.service.base.UserService;
 import com.rachev.ethereumfetcher.util.RlpDecoderUtil;
-import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

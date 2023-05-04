@@ -9,5 +9,4 @@ public class EthereumFetcherApplication {
     public static void main(String[] args) {
         SpringApplication.run(EthereumFetcherApplication.class, args);
     }
-
 }
