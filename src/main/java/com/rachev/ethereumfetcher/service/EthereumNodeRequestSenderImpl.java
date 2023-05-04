@@ -32,7 +32,6 @@ public class EthereumNodeRequestSenderImpl implements EthereumNodeRequestSender,
     private static final String GET_TRANSACTION_RECEIPT_METHOD = "eth_getTransactionReceipt";
     private static final String BLOCK_HASH_PARAM = "blockHash";
     private static final String TOPICS_PARAM = "topics";
-    private static final int WEB_CLIENT_BUFFER_SIZE = 16 * 1024 * 1024;
 
     @Value("${eth.infura.goerli.node-url}")
     private String ethereumNodeUrl;
@@ -51,7 +50,7 @@ public class EthereumNodeRequestSenderImpl implements EthereumNodeRequestSender,
     }
 
     @Override
-    public UnifiedTransactionDto getTransactionByHash(final String hash, @Nullable String network) {
+    public UnifiedTransactionDto getTransactionByHash(final String hash, @Nullable String networkSwitch) {
         final InfuraTransactionByHashRequestDto request = new InfuraTransactionByHashRequestDto();
         request.setMethod(GET_TRANSACTION_BY_HASH_METHOD);
         request.setParams(List.of(hash));

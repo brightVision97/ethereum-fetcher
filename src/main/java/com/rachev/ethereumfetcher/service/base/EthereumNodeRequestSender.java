@@ -6,7 +6,7 @@ import jakarta.annotation.Nullable;
 
 public interface EthereumNodeRequestSender {
 
-    UnifiedTransactionDto getTransactionByHash(final String hash, @Nullable String infuraNetwork);
+    UnifiedTransactionDto getTransactionByHash(final String hash, @Nullable String networkSwitch);
 
     Integer getLogsCountByBlockHash(final String blockHash);
 

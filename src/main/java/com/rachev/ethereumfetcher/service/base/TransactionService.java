@@ -5,7 +5,7 @@ import jakarta.annotation.Nullable;
 
 public interface TransactionService {
 
-    TransactionsDto getTransactionsByHashes(final String rlpHex, @Nullable String network, String requesterUsername);
+    TransactionsDto getTransactionsByHashes(final String rlpHex, @Nullable String networkSwitch, String requesterUsername);
 
     TransactionsDto getAllTransactions();
 
