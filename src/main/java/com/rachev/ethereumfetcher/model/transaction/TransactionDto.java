@@ -57,5 +57,5 @@ public class TransactionDto {
     @Transient
     private List<UserDto> users;
 
-    private int logCount;
+    private int logsCount;
 }

@@ -35,7 +35,6 @@ public class Transaction {
 
     private String contractAddress;
 
-    @Column(nullable = false)
     private Integer logsCount;
 
     @Column(columnDefinition = "text", nullable = false)

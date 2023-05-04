@@ -81,7 +81,7 @@ public class TransactionServiceImpl implements TransactionService {
                         .getTransactions()
                         .stream()
                         .map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
-                        .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(UnifiedTransactionDto::getLogsCount)))))
+                        .collect(Collectors.toList()))
                 .build();
     }
 }
