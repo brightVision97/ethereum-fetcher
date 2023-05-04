@@ -70,12 +70,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @SneakyThrows
     @Override
     public JwtResponse refreshToken(HttpServletRequest request) {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final var authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new JwtException("Bearer header missing");
         }
-        final String refreshToken = authHeader.substring(7);
-        final String username = jwtTokenUtil.extractUsername(refreshToken);
+        final var refreshToken = authHeader.substring(7);
+        final var username = jwtTokenUtil.extractUsername(refreshToken);
         if (username != null) {
             var user = userService.getUserByUsername(username);
             if (jwtTokenUtil.isTokenValid(refreshToken, user)) {
@@ -88,6 +88,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .build();
             }
         }
-        return null;
+        throw new JwtException("Error while refreshing token");
     }
 }

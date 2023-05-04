@@ -41,11 +41,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = {Throwable.class})
     public TransactionsDto getTransactionsByHashes(final String rlpHex, @Nullable String networkSwitch, String currentPrincipalUsername) {
-        User authenticatedPrincipal = userService.getUserByUsername(currentPrincipalUsername);
+        var authenticatedPrincipal = userService.getUserByUsername(currentPrincipalUsername);
         List<UnifiedTransactionDto> transactions = rlpDecoderUtil.decodeRlpToList(rlpHex).stream()
                 .map(hash -> transactionRepository.findByTransactionHash(hash)
                         .orElseGet(() -> {
-                            UnifiedTransactionDto transactionDto = ethereumNodeRequestSender.getTransactionByHash(hash, networkSwitch);
+                            var transactionDto = ethereumNodeRequestSender.getTransactionByHash(hash, networkSwitch);
                             return transactionDto == null ? null : saveTransaction(transactionDto);
                         }))
                 .filter(Objects::nonNull)

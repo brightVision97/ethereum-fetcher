@@ -1,7 +1,6 @@
 package com.rachev.ethereumfetcher.service;
 
 import com.rachev.ethereumfetcher.model.eth.*;
-import com.rachev.ethereumfetcher.model.transaction.TransactionDto;
 import com.rachev.ethereumfetcher.model.transaction.TransactionReceiptDto;
 import com.rachev.ethereumfetcher.model.transaction.UnifiedTransactionDto;
 import com.rachev.ethereumfetcher.service.base.EthereumNodeRequestSender;
@@ -51,14 +50,14 @@ public class EthereumNodeRequestSenderImpl implements EthereumNodeRequestSender,
 
     @Override
     public UnifiedTransactionDto getTransactionByHash(final String hash, @Nullable String networkSwitch) {
-        final InfuraTransactionByHashRequestDto request = new InfuraTransactionByHashRequestDto();
+        final var request = new InfuraTransactionByHashRequestDto();
         request.setMethod(GET_TRANSACTION_BY_HASH_METHOD);
         request.setParams(List.of(hash));
-        InfuraTransactionByHashResponseDto response = sendPostRequestWithBody(
+        var response = sendPostRequestWithBody(
                 webClient, InfuraTransactionByHashResponseDto.class, request, InfuraTransactionByHashRequestDto.class
         );
-        final TransactionDto transaction = response.getResult();
-        final TransactionReceiptDto receipt = getTransactionReceipt(hash);
+        final var transaction = response.getResult();
+        final var receipt = getTransactionReceipt(hash);
         final int logsCount = getLogsCountByBlockHash(transaction.getBlockHash());
         return UnifiedTransactionDto.builder()
                 .transactionHash(transaction.getHash())
@@ -79,21 +78,19 @@ public class EthereumNodeRequestSenderImpl implements EthereumNodeRequestSender,
         if (StringUtils.isBlank(blockHash)) {
             return null;
         }
-        final InfuraGetLogsRequestDto request = new InfuraGetLogsRequestDto();
+        final var request = new InfuraGetLogsRequestDto();
         request.setMethod(GET_LOGS_METHOD);
         request.setParams(List.of(Map.of(BLOCK_HASH_PARAM, blockHash, TOPICS_PARAM, List.of())));
-        InfuraGetLogsResponseDto response = sendPostRequestWithBody(
-                webClient, InfuraGetLogsResponseDto.class, request, InfuraGetLogsRequestDto.class
-        );
+        var response = sendPostRequestWithBody(webClient, InfuraGetLogsResponseDto.class, request, InfuraGetLogsRequestDto.class);
         return CollectionUtils.isEmpty(response.getResult()) ? 0 : response.getResult().size();
     }
 
     @Override
     public TransactionReceiptDto getTransactionReceipt(String transactionHash) {
-        final InfuraTransactionByHashRequestDto request = new InfuraTransactionByHashRequestDto();
+        final var request = new InfuraTransactionByHashRequestDto();
         request.setMethod(GET_TRANSACTION_RECEIPT_METHOD);
         request.setParams(List.of(transactionHash));
-        InfuraTransactionReceiptResponseDto response = sendPostRequestWithBody(
+        var response = sendPostRequestWithBody(
                 webClient, InfuraTransactionReceiptResponseDto.class, request, InfuraTransactionByHashRequestDto.class
         );
         return response.getResult() == null ? new TransactionReceiptDto() : response.getResult();

@@ -22,7 +22,7 @@ public class UsersDatabaseTablePopulator implements CommandLineRunner {
     }
 
     private DatabasePopulator createDatabasePopulator() {
-        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+        var databasePopulator = new ResourceDatabasePopulator();
         databasePopulator.setContinueOnError(true);
         databasePopulator.addScript(new ClassPathResource("insertUsers.sql"));
         return databasePopulator;

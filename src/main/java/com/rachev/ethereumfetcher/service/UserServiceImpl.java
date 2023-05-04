@@ -19,7 +19,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(UserDto user) {
-        User toSave = User.builder()
+        var toSave = User.builder()
                 .username(user.getUsername())
                 .password(bcryptEncoder.encode(user.getPassword()))
                 .build();

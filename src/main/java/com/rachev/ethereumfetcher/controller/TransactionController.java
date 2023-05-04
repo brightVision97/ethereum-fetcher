@@ -52,7 +52,7 @@ public class TransactionController {
     public ResponseEntity<?> getTransactionsByRlpHex(@PathVariable String rlphex,
                                                      @RequestParam(required = false) String network,
                                                      Principal principal) {
-        final String username = ((UserDetails) (((UsernamePasswordAuthenticationToken) principal)).getPrincipal()).getUsername();
+        final var username = ((UserDetails) (((UsernamePasswordAuthenticationToken) principal)).getPrincipal()).getUsername();
         return ResponseEntity.ok(transactionService.getTransactionsByHashes(rlphex, network, username));
     }
 
@@ -104,9 +104,8 @@ public class TransactionController {
             }
     )
     @GetMapping("/my")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getMyTransactions(Principal principal) {
-        final String username = ((UserDetails) (((UsernamePasswordAuthenticationToken) principal)).getPrincipal()).getUsername();
+        final var username = ((UserDetails) (((UsernamePasswordAuthenticationToken) principal)).getPrincipal()).getUsername();
         return ResponseEntity.ok(transactionService.getMyTransactions(username));
     }
 }
