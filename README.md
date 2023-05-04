@@ -57,6 +57,12 @@ All the following pairs will work:
 After request returns the generated access token, it can be passed onwards
 on each request as an `Authorization Bearer` header
 
+# Swagger-UI
+OpenAPI is used to build an api documentation with possibility to test each endpoint. When server is started that is available at:
+
+`http://localhost:9000/swagger-ui/index.html`
+
+
 # Endpoints and examples
 
 ### Endpoint: `/lime/eth/:rlphex`
