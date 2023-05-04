@@ -1,7 +1,7 @@
-package com.rachev.ethereumfetcher.controller.advice;
+package com.rachev.ethereumfetcher.exception;
 
 import com.rachev.ethereumfetcher.model.ApiError;
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -68,5 +68,45 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    @ExceptionHandler({Exception.class, Throwable.class})
+    protected ResponseEntity<?> handleThrowable(Exception ex, WebRequest request) {
+        log.error(ex.getLocalizedMessage(), ex);
+        final ApiError apiError = ApiError.builder()
+                .message(ex.getLocalizedMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    @ExceptionHandler({AuthenticationException.class})
+    protected ResponseEntity<?> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
+        log.error(ex.getLocalizedMessage(), ex);
+        final ApiError apiError = ApiError.builder()
+                .message(ex.getLocalizedMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+    }
+
+    @ExceptionHandler({UsernameNotFoundException.class})
+    protected ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException ex, WebRequest request) {
+        log.error(ex.getLocalizedMessage(), ex);
+        final ApiError apiError = ApiError.builder()
+                .message(ex.getLocalizedMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler({JwtException.class})
+    protected ResponseEntity<?> handleJwtException(JwtException ex, WebRequest request) {
+        log.error(ex.getLocalizedMessage(), ex);
+        final ApiError apiError = ApiError.builder()
+                .message(ex.getLocalizedMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY, request);
     }
 }

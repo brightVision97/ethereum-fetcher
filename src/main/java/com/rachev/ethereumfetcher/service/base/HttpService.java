@@ -1,8 +1,10 @@
 package com.rachev.ethereumfetcher.service.base;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 public interface HttpService {
 
@@ -16,5 +18,12 @@ public interface HttpService {
                     throw new RuntimeException(e.getMessage());
                 })
                 .block();
+    }
+
+    default WebClient getWebClientForAnotherNetwork(String network, String baseGoerliUrl) {
+        return WebClient.builder()
+                .baseUrl(baseGoerliUrl.replace("goerli", network))
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.create().wiretap(true)))
+                .build();
     }
 }

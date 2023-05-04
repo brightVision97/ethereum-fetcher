@@ -3,8 +3,12 @@ package com.rachev.ethereumfetcher.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 @Entity
-@Table(name = "transaction", indexes = @Index(columnList = "hash"))
+@Table(name = "transaction", indexes = @Index(columnList = "transactionHash, blockHash"))
 @Data
 public class Transaction {
 
@@ -12,14 +16,16 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "block_hash")
+    @Column(nullable = false, unique = true)
+    private String transactionHash;
+
+    private String transactionStatus;
+
+    @Column(nullable = false)
     private String blockHash;
 
-    @Column(name = "block_number")
+    @Column(nullable = false)
     private String blockNumber;
-
-    @Column(name = "chain_id")
-    private String chainId;
 
     @Column(name = "_from", nullable = false)
     private String from;
@@ -27,42 +33,17 @@ public class Transaction {
     @Column(name = "_to")
     private String to;
 
-    @Column(name = "gas", nullable = false)
-    private String gas;
+    private String contractAddress;
 
-    @Column(name = "gas_price", nullable = false)
-    private String gasPrice;
+    @Column(nullable = false)
+    private Integer logsCount;
 
-    @Column(name = "hash", nullable = false, unique = true)
-    private String hash;
-
-    @Column(name = "input", columnDefinition = "text", nullable = false)
+    @Column(columnDefinition = "text", nullable = false)
     private String input;
 
-    @Column(name = "max_fee_per_gass")
-    private String maxFeePerGas;
-
-    @Column(name = "max_priority_fee_per_gas")
-    private String maxPriorityFeePerGas;
-
-    @Column(name = "nonce", nullable = false)
-    private String nonce;
-
-    @Column(name = "r", nullable = false)
-    private String r;
-
-    @Column(name = "s", nullable = false)
-    private String s;
-
-    @Column(name = "transaction_index")
-    private String transactionIndex;
-
-    @Column(name = "type", nullable = false)
-    private String type;
-
-    @Column(name = "v", nullable = false)
-    private String v;
-
-    @Column(name = "value", nullable = false)
+    @Column(nullable = false)
     private String value;
+
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "transactions")
+    private List<User> users = new ArrayList<>();
 }

@@ -9,7 +9,7 @@ import org.web3j.utils.Numeric;
 import java.util.List;
 
 @Component
-public class RlpDecoderUtil {
+public final class RlpDecoderUtil {
 
     public List<String> decodeRlpToList(final String rlpHex) {
         RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(rlpHex));

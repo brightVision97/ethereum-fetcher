@@ -1,6 +1,8 @@
-package com.rachev.ethereumfetcher.model;
+package com.rachev.ethereumfetcher.model.transaction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.rachev.ethereumfetcher.model.user.UserDto;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
 import java.util.List;
@@ -8,6 +10,9 @@ import java.util.List;
 // this isn't a record because the model mapper couldn't work properly
 @Data
 public class TransactionDto {
+
+    @JsonIgnore
+    private Long id;
 
     @JsonIgnore
     private List<Object> accessList;
@@ -47,4 +52,10 @@ public class TransactionDto {
     private String v;
 
     private String value;
+
+    @JsonIgnore
+    @Transient
+    private List<UserDto> users;
+
+    private int logCount;
 }
