@@ -12,13 +12,15 @@ import com.rachev.ethereumfetcher.util.RlpDecoderUtil;
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,8 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserService userService;
 
     @Override
-    @Transactional
-    @Synchronized
+    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = {Throwable.class})
     public TransactionsDto getTransactionsByHashes(final String rlpHex, @Nullable String network, String currentPrincipalUsername) {
         if (StringUtils.isBlank(rlpHex)) {
             return getMyTransactions(currentPrincipalUsername);
