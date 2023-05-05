@@ -42,8 +42,9 @@ public class User implements UserDetails {
     private List<Token> tokens;
 
     public void linkTransaction(Transaction transaction) {
-        transactions.add(transaction);
-        transaction.getUsers().add(this);
+        if (transactions.add(transaction)) {
+            transaction.getUsers().add(this);
+        }
     }
 
     @Override
