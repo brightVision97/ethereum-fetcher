@@ -37,7 +37,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserService userService;
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = {Throwable.class})
+    @Transactional
     public TransactionsDto getTransactionsByHashes(final String rlpHex, @Nullable String networkSwitch, String currentPrincipalUsername) {
         var authenticatedPrincipal = userService.getUserByUsername(currentPrincipalUsername);
         List<UnifiedTransactionDto> transactions = rlpDecoderUtil.decodeRlpToList(rlpHex).stream()
