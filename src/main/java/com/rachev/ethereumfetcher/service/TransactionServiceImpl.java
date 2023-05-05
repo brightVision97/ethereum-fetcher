@@ -13,10 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -52,7 +50,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .onClose(() -> userService.updateUser(authenticatedPrincipal))
                 .toList();
         return TransactionsDto.builder()
-                .transactions(new LinkedHashSet<>(transactions))
+                .transactions(transactions)
                 .build();
     }
 
@@ -66,7 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
                 .toList();
         return TransactionsDto.builder()
-                .transactions(new LinkedHashSet<>(transactions))
+                .transactions(transactions)
                 .build();
     }
 
