@@ -16,7 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 public class Token {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "tokenSeqGen", sequenceName = "tokenSeq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tokenSeqGen")
     private Long id;
 
     @Column(unique = true)

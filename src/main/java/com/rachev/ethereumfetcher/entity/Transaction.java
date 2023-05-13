@@ -13,7 +13,8 @@ import java.util.List;
 public class Transaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "transactionSeqGen", sequenceName = "transactionSeq", initialValue = 5, allocationSize = 100)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transactionSeqGen")
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -43,6 +44,6 @@ public class Transaction {
     @Column(nullable = false)
     private String value;
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "transactions")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "transactions")
     private List<User> users = new ArrayList<>();
 }

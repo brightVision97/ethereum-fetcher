@@ -13,11 +13,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -35,25 +36,27 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserService userService;
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public TransactionsDto getTransactionsByHashes(final String rlpHex, @Nullable String networkSwitch, String currentPrincipalUsername) {
-        var authenticatedPrincipal = userService.getUserByUsername(currentPrincipalUsername);
+        var currentRequester = userService.getUserByUsername(currentPrincipalUsername);
         List<UnifiedTransactionDto> transactions = rlpDecoderUtil.decodeRlpToList(rlpHex).stream()
-                .map(hash -> transactionRepository.findByTransactionHash(hash)
+                .map(decodedHash -> transactionRepository.findByTransactionHash(decodedHash)
                         .orElseGet(() -> {
-                            var transactionDto = ethereumNodeRequestSender.getTransactionByHash(hash, networkSwitch);
+                            var transactionDto = ethereumNodeRequestSender.getTransactionByHash(decodedHash, networkSwitch);
                             return transactionDto == null ? null : saveTransaction(transactionDto);
-                        }))
+                        })
+                )
                 .filter(Objects::nonNull)
-                .peek(authenticatedPrincipal::linkTransaction)
+                .peek(currentRequester::linkTransaction)
                 .map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
-                .onClose(() -> userService.updateUser(authenticatedPrincipal))
+                .onClose(() -> userService.updateUser(currentRequester))
                 .toList();
         return TransactionsDto.builder()
                 .transactions(transactions)
                 .build();
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private Transaction saveTransaction(UnifiedTransactionDto transactionDto) {
         return transactionRepository.save(modelMapper.map(transactionDto, Transaction.class));
     }
@@ -70,12 +73,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionsDto getMyTransactions(String username) {
+        List<UnifiedTransactionDto> transactions = userService.getUserByUsername(username)
+                .getTransactions()
+                .stream()
+                .map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
+                .toList();
         return TransactionsDto.builder()
-                .transactions(userService.getUserByUsername(username)
-                        .getTransactions()
-                        .stream()
-                        .map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
-                        .collect(Collectors.toList()))
+                .transactions(transactions)
                 .build();
     }
 }

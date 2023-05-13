@@ -10,6 +10,8 @@ import com.rachev.ethereumfetcher.service.base.AuthenticationService;
 import com.rachev.ethereumfetcher.service.base.UserService;
 import com.rachev.ethereumfetcher.util.JwtTokenUtil;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.lang.Collections;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -57,7 +59,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private void revokeAllUserTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getUsername());
-        if (validUserTokens.isEmpty()) {
+        if (Collections.isEmpty(validUserTokens)) {
             return;
         }
         validUserTokens.forEach(token -> {
@@ -88,6 +90,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .build();
             }
         }
-        throw new JwtException("Error while refreshing token");
+        throw new MalformedJwtException("Error while refreshing token");
     }
 }

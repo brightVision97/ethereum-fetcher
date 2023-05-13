@@ -2,6 +2,7 @@ package com.rachev.ethereumfetcher.exception;
 
 import com.rachev.ethereumfetcher.model.ApiError;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -100,7 +101,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
-    @ExceptionHandler({JwtException.class})
+    @ExceptionHandler({JwtException.class, MalformedJwtException.class})
     protected ResponseEntity<?> handleJwtException(JwtException ex, WebRequest request) {
         log.error(ex.getLocalizedMessage(), ex);
         final ApiError apiError = ApiError.builder()
@@ -108,5 +109,15 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY, request);
+    }
+
+    @ExceptionHandler({RlpDecodingException.class})
+    protected ResponseEntity<?> handleMalformedRlpException(RlpDecodingException ex, WebRequest request) {
+        log.error(ex.getLocalizedMessage(), ex);
+        final ApiError apiError = ApiError.builder()
+                .message(ex.getLocalizedMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE, request);
     }
 }

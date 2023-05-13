@@ -1,0 +1,5 @@
+<persistence-unit name="ethereum-fetcher">
+    <properties>
+        <property name="hibernate.id.new_generator_mappings" value="true"/>
+    </properties>
+</persistence-unit>
