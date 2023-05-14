@@ -74,8 +74,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionsDto getMyTransactions(String username) {
-        List<UnifiedTransactionDto> transactions = userService.getUserByUsername(username)
-                .getTransactions()
+        var user = userService.getUserByUsername(username);
+        List<UnifiedTransactionDto> transactions = transactionRepository.findAllByUsersIn(List.of(user), Sort.by(Sort.Direction.ASC, "created"))
                 .stream()
                 .map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
                 .toList();
