@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -26,10 +25,6 @@ public final class JwtTokenUtil {
     @Value("${security.jwt.expiration}")
     private Long jwtExpiration;
 
-    @Value("${security.jwt.refresh-token.expiration}")
-    private Long refreshExpiration;
-
-    //retrieve username from jwt token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -45,10 +40,6 @@ public final class JwtTokenUtil {
 
     public String generateToken(Map<String, Object> extraClaims, User userDetails) {
         return buildToken(extraClaims, userDetails, jwtExpiration);
-    }
-
-    public String generateRefreshToken(User userDetails) {
-        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 
     private String buildToken(Map<String, Object> extraClaims, User userDetails, long expiration) {

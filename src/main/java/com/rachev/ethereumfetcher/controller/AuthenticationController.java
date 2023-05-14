@@ -1,25 +1,24 @@
 package com.rachev.ethereumfetcher.controller;
 
 
-import com.rachev.ethereumfetcher.model.jwt.JwtRequest;
+import com.rachev.ethereumfetcher.model.auth.AuthRequest;
+import com.rachev.ethereumfetcher.model.auth.RefreshTokenRequest;
 import com.rachev.ethereumfetcher.service.base.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/lime")
 @RequiredArgsConstructor
 @Tag(name = "Authentication")
-public class JwtAuthenticationController {
+public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
@@ -44,7 +43,7 @@ public class JwtAuthenticationController {
             }
     )
     @PostMapping("/authenticate")
-    public ResponseEntity<?> createAuthenticfationToken(@RequestBody JwtRequest request) {
+    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
@@ -68,7 +67,7 @@ public class JwtAuthenticationController {
             }
     )
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(authenticationService.refreshToken(request));
     }
 }

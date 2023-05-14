@@ -33,7 +33,9 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequests ->
-                        authRequests.requestMatchers("/lime/authenticate",
+                        authRequests.requestMatchers(
+                                        "/lime/authenticate",
+                                        "lime/refresh-token",
                                         "/v2/api-docs",
                                         "/v3/api-docs",
                                         "/v3/api-docs/**",

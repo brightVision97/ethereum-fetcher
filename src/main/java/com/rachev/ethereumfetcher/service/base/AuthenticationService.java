@@ -1,12 +1,12 @@
 package com.rachev.ethereumfetcher.service.base;
 
-import com.rachev.ethereumfetcher.model.jwt.JwtRequest;
-import com.rachev.ethereumfetcher.model.jwt.JwtResponse;
-import jakarta.servlet.http.HttpServletRequest;
+import com.rachev.ethereumfetcher.model.auth.AuthRequest;
+import com.rachev.ethereumfetcher.model.auth.AuthResponse;
+import com.rachev.ethereumfetcher.model.auth.RefreshTokenRequest;
 
 public interface AuthenticationService {
 
-    JwtResponse authenticate(JwtRequest request);
+    AuthResponse authenticate(AuthRequest request);
 
-    JwtResponse refreshToken(HttpServletRequest request);
+    AuthResponse refreshToken(RefreshTokenRequest request);
 }

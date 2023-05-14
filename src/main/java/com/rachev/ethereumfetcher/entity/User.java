@@ -2,10 +2,7 @@ package com.rachev.ethereumfetcher.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -27,7 +24,8 @@ import java.util.Set;
                 @NamedAttributeNode("tokens")
         }
 )
-public class User implements UserDetails {
+@EqualsAndHashCode(callSuper = false)
+public class User extends BaseEntity implements UserDetails {
 
     @Id
     @SequenceGenerator(name = "userSeqGen", sequenceName = "userSeq", initialValue = 5, allocationSize = 100)

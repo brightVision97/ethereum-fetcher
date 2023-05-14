@@ -1,21 +1,19 @@
 package com.rachev.ethereumfetcher.service;
 
+import com.rachev.ethereumfetcher.entity.RefreshToken;
 import com.rachev.ethereumfetcher.entity.Token;
 import com.rachev.ethereumfetcher.entity.Token.TokenType;
 import com.rachev.ethereumfetcher.entity.User;
-import com.rachev.ethereumfetcher.model.jwt.JwtRequest;
-import com.rachev.ethereumfetcher.model.jwt.JwtResponse;
+import com.rachev.ethereumfetcher.exception.RefreshTokenException;
+import com.rachev.ethereumfetcher.model.auth.AuthRequest;
+import com.rachev.ethereumfetcher.model.auth.AuthResponse;
+import com.rachev.ethereumfetcher.model.auth.RefreshTokenRequest;
 import com.rachev.ethereumfetcher.repository.TokenRepository;
 import com.rachev.ethereumfetcher.service.base.AuthenticationService;
 import com.rachev.ethereumfetcher.service.base.UserService;
 import com.rachev.ethereumfetcher.util.JwtTokenUtil;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.lang.Collections;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -28,21 +26,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final TokenRepository tokenRepository;
 
+    private final RefreshTokenService refreshTokenService;
+
     private final JwtTokenUtil jwtTokenUtil;
 
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public JwtResponse authenticate(JwtRequest request) {
+    public AuthResponse authenticate(AuthRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         final var user = userService.getUserByUsername(request.getUsername());
         final var token = jwtTokenUtil.generateToken(user);
-        final var refreshToken = jwtTokenUtil.generateRefreshToken(user);
+        refreshTokenService.deleteByUserId(user.getId());
+        final var refreshToken = refreshTokenService.createRefreshToken(user.getId());
         revokeAllUserTokens(user);
         saveUserToken(user, token);
-        return JwtResponse.builder()
-                .token(token)
-                .refreshToken(refreshToken)
+        return AuthResponse.builder()
+                .accessToken(token)
+                .refreshToken(refreshToken.getToken())
                 .build();
     }
 
@@ -69,27 +70,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenRepository.saveAll(validUserTokens);
     }
 
-    @SneakyThrows
     @Override
-    public JwtResponse refreshToken(HttpServletRequest request) {
-        final var authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new JwtException("Bearer header missing");
-        }
-        final var refreshToken = authHeader.substring(7);
-        final var username = jwtTokenUtil.extractUsername(refreshToken);
-        if (username != null) {
-            var user = userService.getUserByUsername(username);
-            if (jwtTokenUtil.isTokenValid(refreshToken, user)) {
-                var accessToken = jwtTokenUtil.generateToken(user);
-                revokeAllUserTokens(user);
-                saveUserToken(user, accessToken);
-                return JwtResponse.builder()
-                        .token(accessToken)
-                        .refreshToken(refreshToken)
-                        .build();
-            }
-        }
-        throw new MalformedJwtException("Error while refreshing token");
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+        var requestRefreshToken = request.getRefreshToken();
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    var token = jwtTokenUtil.generateToken(user);
+                    return AuthResponse.builder()
+                            .accessToken(token)
+                            .refreshToken(requestRefreshToken)
+                            .build();
+                })
+                .orElseThrow(() -> new RefreshTokenException("Refresh token is not in database!"));
     }
 }

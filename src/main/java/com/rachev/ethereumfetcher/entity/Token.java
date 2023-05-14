@@ -1,10 +1,7 @@
 package com.rachev.ethereumfetcher.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 @Data
@@ -13,7 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 @AllArgsConstructor
 @Entity
 @Table(name = "token", indexes = @Index(columnList = "token"))
-public class Token {
+@EqualsAndHashCode(callSuper = false)
+public class Token extends BaseEntity {
 
     @Id
     @SequenceGenerator(name = "tokenSeqGen", sequenceName = "tokenSeq", allocationSize = 1)

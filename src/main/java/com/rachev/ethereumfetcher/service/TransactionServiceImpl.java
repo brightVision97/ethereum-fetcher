@@ -12,6 +12,7 @@ import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -63,7 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionsDto getAllTransactions() {
-        List<UnifiedTransactionDto> transactions = transactionRepository.findAll().stream()
+        List<UnifiedTransactionDto> transactions = transactionRepository.findAll(Sort.by(Sort.Direction.ASC, "created")).stream()
                 .map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
                 .toList();
         return TransactionsDto.builder()

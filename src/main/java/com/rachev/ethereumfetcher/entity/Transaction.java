@@ -2,6 +2,7 @@ package com.rachev.ethereumfetcher.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.List;
 @Entity
 @Table(name = "transaction", indexes = @Index(columnList = "transactionHash, blockHash"))
 @Data
-public class Transaction {
+@EqualsAndHashCode(callSuper = false)
+public class Transaction extends BaseEntity {
 
     @Id
     @SequenceGenerator(name = "transactionSeqGen", sequenceName = "transactionSeq", initialValue = 5, allocationSize = 100)
