@@ -2,6 +2,7 @@ package com.rachev.ethereumfetcher.config;
 
 import com.rachev.ethereumfetcher.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.convention.NamingConventions;
@@ -22,7 +23,7 @@ import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
-public class ApplicationBeanConfiguration {
+public class ApplicationBeanConfig {
 
     private final UserRepository repository;
 
@@ -54,7 +55,7 @@ public class ApplicationBeanConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(@NotNull AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 

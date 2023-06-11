@@ -8,5 +8,5 @@ public interface AuthenticationService {
 
     AuthResponse authenticate(AuthRequest request);
 
-    AuthResponse refreshToken(RefreshTokenRequest request);
+    AuthResponse refreshToken(RefreshTokenRequest request, String username);
 }

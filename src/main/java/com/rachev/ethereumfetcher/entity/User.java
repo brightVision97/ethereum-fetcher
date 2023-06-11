@@ -1,29 +1,24 @@
 package com.rachev.ethereumfetcher.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.redis.core.index.Indexed;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "_user")
 @Data
+@ToString
 @Builder
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
-@NamedEntityGraph(
-        name = "user_transactions_graph",
-        attributeNodes = {
-                @NamedAttributeNode("transactions"),
-                @NamedAttributeNode("tokens")
-        }
-)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class User extends BaseEntity implements UserDetails {
 
@@ -32,9 +27,9 @@ public class User extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSeqGen")
     private Long id;
 
+    @Indexed
     private String username;
 
-    @JsonIgnore
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
@@ -44,23 +39,23 @@ public class User extends BaseEntity implements UserDetails {
     )
     private Set<Transaction> transactions = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    private Set<Token> tokens;
 
-    public void linkTransaction(Transaction transaction) {
+    public Transaction linkTransaction(Transaction transaction) {
         if (transactions.add(transaction)) {
             transaction.getUsers().add(this);
         }
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
+        return transaction;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return Collections.checkedCollection(Collections.emptyList(), GrantedAuthority.class);
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     @Override

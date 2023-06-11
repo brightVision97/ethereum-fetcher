@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 @AllArgsConstructor
 @Entity
 @Table(name = "token", indexes = @Index(columnList = "token"))
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class Token extends BaseEntity {
 
     @Id

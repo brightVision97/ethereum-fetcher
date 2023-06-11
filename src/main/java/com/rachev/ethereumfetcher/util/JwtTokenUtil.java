@@ -1,5 +1,6 @@
 package com.rachev.ethereumfetcher.util;
 
+import com.rachev.ethereumfetcher.entity.BaseEntity;
 import com.rachev.ethereumfetcher.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -8,9 +9,11 @@ import io.jsonwebtoken.impl.DefaultJwsHeader;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,6 +28,9 @@ public final class JwtTokenUtil {
     @Value("${security.jwt.expiration}")
     private Long jwtExpiration;
 
+    @Value("${security.jwt.refresh-token.expiration}")
+    private Long refreshExpiration;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -38,11 +44,15 @@ public final class JwtTokenUtil {
         return generateToken(new LinkedHashMap<>(), userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, User userDetails) {
+    private String generateToken(Map<String, ?> extraClaims, User userDetails) {
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
-    private String buildToken(Map<String, Object> extraClaims, User userDetails, long expiration) {
+    public <T extends BaseEntity & UserDetails> String generateRefreshToken(T userDetails) {
+        return buildToken(Collections.emptyMap(), userDetails, refreshExpiration);
+    }
+
+    private String buildToken(Map<String, ?> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setHeaderParam(DefaultJwsHeader.TYPE, DefaultJwsHeader.JWT_TYPE)

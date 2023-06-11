@@ -1,6 +1,7 @@
 package com.rachev.ethereumfetcher.service;
 
 import com.rachev.ethereumfetcher.entity.Transaction;
+import com.rachev.ethereumfetcher.entity.User;
 import com.rachev.ethereumfetcher.model.transaction.TransactionsDto;
 import com.rachev.ethereumfetcher.model.transaction.UnifiedTransactionDto;
 import com.rachev.ethereumfetcher.repository.TransactionRepository;
@@ -14,12 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -37,29 +35,26 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserService userService;
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public TransactionsDto getTransactionsByHashes(final String rlpHex, @Nullable String networkSwitch, String currentPrincipalUsername) {
+    public List<UnifiedTransactionDto> getTransactionsByHashes(final String rlpHex, @Nullable String networkSwitch, String currentPrincipalUsername) {
         var currentRequester = userService.getUserByUsername(currentPrincipalUsername);
-        List<UnifiedTransactionDto> transactions = rlpDecoderUtil.decodeRlpToList(rlpHex).stream()
-                .map(decodedHash -> transactionRepository.findByTransactionHash(decodedHash)
-                        .orElseGet(() -> {
-                            var transactionDto = ethereumNodeRequestSender.getTransactionByHash(decodedHash, networkSwitch);
-                            return transactionDto == null ? null : saveTransaction(transactionDto);
-                        })
-                )
-                .filter(Objects::nonNull)
-                .peek(currentRequester::linkTransaction)
-                .map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
+
+        return rlpDecoderUtil.decodeRlpToList(rlpHex).stream()
+                .map(decodedHash -> transactionRepository.findByTransactionHash(decodedHash).orElseGet(() -> {
+                    var ethTransaction = ethereumNodeRequestSender.getTransactionByHash(decodedHash, networkSwitch);
+
+
+                    return saveTransaction(currentRequester, ethTransaction);
+                })).map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
                 .onClose(() -> userService.updateUser(currentRequester))
+
                 .toList();
-        return TransactionsDto.builder()
-                .transactions(transactions)
-                .build();
+
+
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private Transaction saveTransaction(UnifiedTransactionDto transactionDto) {
-        return transactionRepository.save(modelMapper.map(transactionDto, Transaction.class));
+    @Transactional
+    private Transaction saveTransaction(User user, UnifiedTransactionDto transactionDto) {
+        return user.linkTransaction(transactionRepository.save(modelMapper.map(transactionDto, Transaction.class)));
     }
 
     @Override

@@ -11,7 +11,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -67,7 +71,8 @@ public class AuthenticationController {
             }
     )
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(authenticationService.refreshToken(request));
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request, Principal principal) {
+        final var username = ((UserDetails) (((UsernamePasswordAuthenticationToken) principal)).getPrincipal()).getUsername();
+        return ResponseEntity.ok(authenticationService.refreshToken(request, username));
     }
 }

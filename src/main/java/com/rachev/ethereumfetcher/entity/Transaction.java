@@ -3,6 +3,9 @@ package com.rachev.ethereumfetcher.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +14,8 @@ import java.util.List;
 @Entity
 @Table(name = "transaction", indexes = @Index(columnList = "transactionHash, blockHash"))
 @Data
+@Getter
+@ToString(exclude = "users")
 @EqualsAndHashCode(callSuper = false)
 public class Transaction extends BaseEntity {
 
@@ -20,6 +25,7 @@ public class Transaction extends BaseEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @Indexed
     private String transactionHash;
 
     private String transactionStatus;
