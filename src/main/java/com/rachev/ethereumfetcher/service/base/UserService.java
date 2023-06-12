@@ -10,6 +10,4 @@ public interface UserService {
     void updateUser(User user);
 
     User getUserByUsername(String username);
-
-    User getUserById(Long id);
 }

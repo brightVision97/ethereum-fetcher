@@ -27,7 +27,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final TokenRepository tokenRepository;
 
-
     private final JwtTokenUtil jwtTokenUtil;
 
     private final AuthenticationManager authenticationManager;

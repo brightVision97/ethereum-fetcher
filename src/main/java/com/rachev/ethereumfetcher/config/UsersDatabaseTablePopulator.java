@@ -14,6 +14,8 @@ import javax.sql.DataSource;
 @RequiredArgsConstructor
 public class UsersDatabaseTablePopulator implements CommandLineRunner {
 
+    private static final String INSERT_USERS_SQL_SCRIPT = "insertUsers.sql";
+
     private final DataSource dataSource;
 
     @Override
@@ -24,7 +26,7 @@ public class UsersDatabaseTablePopulator implements CommandLineRunner {
     private DatabasePopulator createDatabasePopulator() {
         var databasePopulator = new ResourceDatabasePopulator();
         databasePopulator.setContinueOnError(true);
-        databasePopulator.addScript(new ClassPathResource("insertUsers.sql"));
+        databasePopulator.addScript(new ClassPathResource(INSERT_USERS_SQL_SCRIPT));
         return databasePopulator;
     }
 }

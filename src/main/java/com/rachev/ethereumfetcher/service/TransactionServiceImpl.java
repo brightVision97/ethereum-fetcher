@@ -9,7 +9,6 @@ import com.rachev.ethereumfetcher.service.base.EthereumNodeRequestSender;
 import com.rachev.ethereumfetcher.service.base.TransactionService;
 import com.rachev.ethereumfetcher.service.base.UserService;
 import com.rachev.ethereumfetcher.util.RlpDecoderUtil;
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -35,21 +34,15 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserService userService;
 
     @Override
-    public List<UnifiedTransactionDto> getTransactionsByHashes(final String rlpHex, @Nullable String networkSwitch, String currentPrincipalUsername) {
+    public List<UnifiedTransactionDto> getTransactionsByHashes(final String rlpHex, String currentPrincipalUsername) {
         var currentRequester = userService.getUserByUsername(currentPrincipalUsername);
-
         return rlpDecoderUtil.decodeRlpToList(rlpHex).stream()
                 .map(decodedHash -> transactionRepository.findByTransactionHash(decodedHash).orElseGet(() -> {
-                    var ethTransaction = ethereumNodeRequestSender.getTransactionByHash(decodedHash, networkSwitch);
-
-
+                    var ethTransaction = ethereumNodeRequestSender.getTransactionByHash(decodedHash);
                     return saveTransaction(currentRequester, ethTransaction);
                 })).map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
                 .onClose(() -> userService.updateUser(currentRequester))
-
                 .toList();
-
-
     }
 
     @Transactional
@@ -59,7 +52,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionsDto getAllTransactions() {
-        List<UnifiedTransactionDto> transactions = transactionRepository.findAll(Sort.by(Sort.Direction.ASC, "created")).stream()
+        List<UnifiedTransactionDto> transactions = transactionRepository.findAll(Sort.by(Sort.Direction.ASC, "created"))
+                .stream()
                 .map(transaction -> modelMapper.map(transaction, UnifiedTransactionDto.class))
                 .toList();
         return TransactionsDto.builder()

@@ -1,12 +1,8 @@
 package com.rachev.ethereumfetcher.service.base;
 
-import jakarta.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
 
 public interface HttpService {
 
@@ -22,15 +18,5 @@ public interface HttpService {
                     throw new RuntimeException(e.getMessage());
                 })
                 .block();
-    }
-
-    default WebClient getWebClientForNetworkOnDemand(@NotNull String network, String baseGoerliUrl) {
-        return WebClient.builder()
-                .baseUrl(baseGoerliUrl.replace("goerli", network))
-                .clientConnector(new ReactorClientHttpConnector(HttpClient.create().wiretap(true)))
-                .exchangeStrategies(ExchangeStrategies.builder()
-                        .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(WEB_CLIENT_BUFFER_SIZE))
-                        .build())
-                .build();
     }
 }

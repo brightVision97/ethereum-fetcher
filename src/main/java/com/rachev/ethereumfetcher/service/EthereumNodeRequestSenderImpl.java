@@ -6,7 +6,6 @@ import com.rachev.ethereumfetcher.model.transaction.UnifiedTransactionDto;
 import com.rachev.ethereumfetcher.service.base.EthereumNodeRequestSender;
 import com.rachev.ethereumfetcher.service.base.HttpService;
 import io.micrometer.common.util.StringUtils;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EthereumNodeRequestSenderImpl implements EthereumNodeRequestSender, HttpService {
+public final class EthereumNodeRequestSenderImpl implements EthereumNodeRequestSender, HttpService {
 
     private static final String GET_TRANSACTION_BY_HASH_METHOD = "eth_getTransactionByHash";
     private static final String GET_LOGS_METHOD = "eth_getLogs";
@@ -49,7 +48,7 @@ public class EthereumNodeRequestSenderImpl implements EthereumNodeRequestSender,
     }
 
     @Override
-    public UnifiedTransactionDto getTransactionByHash(final String hash, @Nullable String networkSwitch) {
+    public UnifiedTransactionDto getTransactionByHash(final String hash) {
         final var request = new InfuraTransactionByHashRequestDto();
         request.setMethod(GET_TRANSACTION_BY_HASH_METHOD);
         request.setParams(List.of(hash));
@@ -58,7 +57,7 @@ public class EthereumNodeRequestSenderImpl implements EthereumNodeRequestSender,
         );
         final var transaction = response.getResult();
         final var receipt = getTransactionReceipt(hash);
-        final int logsCount = getLogsCountByBlockHash(transaction.getBlockHash());
+        final Integer logsCount = getLogsCountByBlockHash(transaction.getBlockHash());
         return UnifiedTransactionDto.builder()
                 .transactionHash(transaction.getHash())
                 .transactionStatus(receipt.getStatus())

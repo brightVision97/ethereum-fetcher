@@ -51,11 +51,9 @@ public class TransactionController {
             }
     )
     @GetMapping("/eth/{rlphex}")
-    public ResponseEntity<?> getTransactionsByRlpHex(@PathVariable String rlphex,
-                                                     @RequestParam(required = false) String network,
-                                                     Principal principal) {
+    public ResponseEntity<?> getTransactionsByRlpHex(@PathVariable String rlphex, Principal principal) {
         final var username = ((UserDetails) (((UsernamePasswordAuthenticationToken) principal)).getPrincipal()).getUsername();
-        return ResponseEntity.ok(transactionService.getTransactionsByHashes(rlphex, network, username));
+        return ResponseEntity.ok(transactionService.getTransactionsByHashes(rlphex, username));
     }
 
     @Operation(
