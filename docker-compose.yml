@@ -4,10 +4,9 @@ services:
   app:
     image: 'docker-spring-boot-postgres:latest'
     build:
-      dockerfile: Dockerfile
       context: .
     ports:
-      - '9000:9000'
+      - '9001:9001'
     depends_on:
       - db
       - cache
